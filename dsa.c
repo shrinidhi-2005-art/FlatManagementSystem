@@ -9,7 +9,7 @@ int main(){
 //declare things....
     //for login: 
     char user[5];
-    int pass, i=1;
+    int pass, i=2;
 
 
 //Login page thing...
@@ -20,18 +20,27 @@ scanf("%4s", user);
 printf("\n          password: ");
 while(1){
     scanf("%d",&pass);
-    if(i==4){
-        printf("Maximum Number Of Attempts");
+    if(i==0){
+        printf("Sorry, Maximum Number Of Attempts Has Reached");
         exit(0);
     }
     if (pass != 1234){
-        printf("\nIncorrect Password, Try again (attempt %d)", i);
+        printf("\nIncorrect Password, Try again (%d attempts left)\n", i);
+        printf("\n          password: ");
     }
-    else
+    else{
         printf("\n--------Successfully Logged In--------");
         break;
-    i++;
+    }
+    i--;
 }
 
+//rest of the code
+
+//menu for the administrator
+//use comments wherever u wanna call fucntions
+//just do the menu and log out option...
+//add whatever features u want and call the functions as comments, i'll just write the functions... try to explain about the function using comments
+//thanks hehe
 return 0;
 }
