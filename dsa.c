@@ -24,7 +24,7 @@ while(1){
         printf("Maximum Number Of Attempts");
         exit(0);
     }
-    if (pass != 1234){
+    if (pass != 12345){
         printf("\nIncorrect Password, Try again (attempt %d)", i);
     }
     else
