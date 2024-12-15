@@ -34,6 +34,7 @@ void read_file(){
     fclose(file);
 }
 
+
 //This one will overwrite the whole thing (i mean file)
 void write_file(){
     FILE *file = fopen(dataset, "w");
