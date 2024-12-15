@@ -4,7 +4,6 @@
 #include "functions.h"
 #include "flats.h"
 
-const char *dataset = "data.csv";
 
 int main(){
 
