@@ -33,19 +33,24 @@ void read_file(){
     fclose(file);
 }
 
+//This one will overwrite the whole thing (i mean file)
 void write_file(){
-    FILE *file = fopen(dataset, "w"){
+    FILE *file = fopen(dataset, "w");
         if (file == NULL){
             printf("error: couldn't open the file");
             return;
         }
-
-    fprintf(file, "Flat ID,Type,Price,Owner Name,Contact Info,Amount Paid So Far (₹),Remaining Balance (₹),Next Monthly Installment (₹),Due Date,Status")
+    
+    fprintf(file, "Flat ID,Type,Price,Owner Name,Contact Info,Amount Paid So Far (₹),Remaining Balance (₹),Next Monthly Installment (₹),Due Date,Status");
 
     for(int i=0; i<current; i++){
-        fprintf(file, "%s,%s,%d,%s,%s,%f,%f,%f,%s,%s",residence[i].ID, residence[i].type, residence[i].owner->owner, residence[i].owner->o_info, residence[i].owner->paid, residence[i].owner->bal, residence[i].owner->due, residence[i].owner->date, residence[i].status  )
+        fprintf(file, "%s,%s,%d,%s,%s,%f,%f,%f,%s,%s",residence[i].ID, residence[i].type, residence[i].owner->owner, residence[i].owner->o_info, residence[i].owner->paid, residence[i].owner->bal, residence[i].owner->due, residence[i].owner->date, residence[i].status  );
     }
     fclose(file);
 
-    }
+}
+
+//this one's for to display the booked flats and the info 
+void display_booked(){
+    
 }
