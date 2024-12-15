@@ -5,7 +5,6 @@
 const char *dataset = "data.csv";
 int current = 100;
 flat residence[];
-
 //owners' struct
 typedef struct {
     char owner[50];
