@@ -1,18 +1,18 @@
 #ifndef FLATS_H
 #define FLATS_H
-#define size 100
+#define size 101
 
 const char *dataset = "data.csv";
 int current = 100;
 //owners' struct
 typedef struct {
-    char owner[50];
+    char name[50];
     char o_info[50];
     float paid;
     float bal;
     float due;
     char date[50];
-}owner;
+}Owner;
 
 //flats' struct
 typedef struct {
@@ -20,7 +20,7 @@ typedef struct {
     char type[10];
     int price;
     char status[10];
-    owner *owner;
+    Owner *owner;
 }flat;
 
 flat residence[size];
