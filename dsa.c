@@ -4,6 +4,11 @@
 #include "functions.h"
 #include "flats.h"
 
+const char *dataset = "data.csv";
+int current = 100;
+flat residence[size];
+
+
 int main(){
 
 //declare things....
@@ -34,7 +39,7 @@ int main(){
         }
         i--;
     }
-
+    read_file();
     menufn();
     return 0;
 }

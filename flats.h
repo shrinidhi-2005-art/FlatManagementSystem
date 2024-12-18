@@ -2,8 +2,8 @@
 #define FLATS_H
 #define size 101
 
-const char *dataset = "data.csv";
-int current = 100;
+extern const char *dataset;
+extern int current;
 //owners' struct
 typedef struct {
     char *name;
@@ -23,7 +23,7 @@ typedef struct {
     Owner *owner;
 }flat;
 
-flat residence[size];
+extern flat residence[size];
 
 
 #endif
