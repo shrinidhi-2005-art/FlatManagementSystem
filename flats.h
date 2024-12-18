@@ -2,24 +2,24 @@
 #define FLATS_H
 #define size 101
 
-extern const char *dataset;
+extern const char dataset[50];
 extern int current;
 //owners' struct
 typedef struct {
-    char *name;
-    char *o_info;
+    char name[50];
+    char o_info[50];
     float paid;
     float bal;
     float due;
-    char *date;
+    char date[50];
 }Owner;
 
 //flats' struct
 typedef struct {
-    char *ID;
-    char *type;
+    char ID[10];
+    char type[10];
     int price;
-    char *status;
+    char status[15];
     Owner *owner;
 }flat;
 

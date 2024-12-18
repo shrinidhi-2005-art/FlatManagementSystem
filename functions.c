@@ -32,10 +32,14 @@ void read_file(){
         return;
     }
 
-    char header[50];
+    char header[150];
     fgets(header, sizeof(header), file); //this will make the function to ignore the 1st line in the csv.. idk how tho
 
-    while(fscanf(file, "%9[^,],%9[^,],%d,%49[^,],%49[^,],%f,%f,%f,%49[^,],%9[\n]\n", flats.ID, flats.type, &flats.price, flats.owner->name, flats.owner->o_info, &flats.owner->paid, &flats.owner->bal, &flats.owner->due, flats.owner->date, flats.status)== 10){
+    while(fscanf(file, "%9[^,],%9[^,],%d,%49[^,],%49[^,],%f,%f,%f,%49[^,],%14[\n]\n", flats.ID, flats.type, &flats.price, flats.owner->name, flats.owner->o_info, &flats.owner->paid, &flats.owner->bal, &flats.owner->due, flats.owner->date, flats.status)== 10){
+        if (current>= size){
+            printf("Error: Exceeded maximum residence capacity");
+            break;
+        }
         residence[current++] = flats;
     }
     fclose(file);
@@ -50,10 +54,10 @@ void write_file(){
             return;
         }
     
-    fprintf(file, "Flat ID,Type,Price,Owner Name,Contact Info,Amount Paid So Far (₹),Remaining Balance (₹),Next Monthly Installment (₹),Due Date,Status");
+    fprintf(file, "Flat ID,Type,Price,Owner Name,Contact Info,Amount Paid So Far (₹),Remaining Balance (₹),Next Monthly Installment (₹),Due Date,Status\n");
 
     for(int i=0; i<current; i++){
-        fprintf(file, "%s,%s,%d,%s,%s,%.2f,%.2f,%.2f,%s,%s",residence[i].ID, residence[i].type, residence[i].price, residence[i].owner->name, residence[i].owner->o_info, residence[i].owner->paid, residence[i].owner->bal, residence[i].owner->due, residence[i].owner->date, residence[i].status  );
+        fprintf(file, "%s,%s,%d,%s,%s,%.2f,%.2f,%.2f,%s,%s\n",residence[i].ID, residence[i].type, residence[i].price, residence[i].owner->name, residence[i].owner->o_info, residence[i].owner->paid, residence[i].owner->bal, residence[i].owner->due, residence[i].owner->date, residence[i].status  );
     }
     fclose(file);
 
@@ -229,7 +233,7 @@ void pay(char *id){
 void flatinfoMenu(){
     int ch;
     char c;
-    char *id;
+    char id[10];
     printf("\nType the flat ID: ");
     do{
         scanf("%s",id);

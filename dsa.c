@@ -4,7 +4,7 @@
 #include "functions.h"
 #include "flats.h"
 
-const char *dataset = "data.csv";
+const char dataset[50] = "data.csv";
 int current = 100;
 flat residence[size];
 
@@ -41,5 +41,20 @@ int main(){
     }
     read_file();
     menufn();
+    // printf("\ndisplay_emi()\n");
+    // display_emi(50000);
+    // printf("\ndisplay_boooked()\n");
+    // display_booked();
+    // printf("\ndisplay_available()\n");
+    // display_available();
+    // printf("\nflatinfomenu()\n");
+    // flatinfoMenu();
+    // printf("\npaymentmenu()\n");
+    // paymentMenu();
+    // printf("\nBookmenu()\n");
+    // bookMenu();
+    // printf("\nsave()\n");
+    // save();
+
     return 0;
 }
