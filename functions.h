@@ -3,11 +3,11 @@
 
 void read_file(void);
 void write_file(void);
-int down(int, int);
-int principal(int, int);
-int emi(int, int, int);
+float down(int, float);
+float principal(int, float);
+float emi(float, int, int);
 int display_emi(int);
-void book(char*, char*, char*);
+int book(char*, char*, char*);
 void display_booked(void);
 void display_available(void);
 int flatinfo(char*);
@@ -20,7 +20,7 @@ void paymentMenu();
 void save();
 void errors(int);
 void backToMenu();
-void mainMenu();
+void menufn();
 
 
 #endif

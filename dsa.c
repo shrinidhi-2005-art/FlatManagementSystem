@@ -35,6 +35,6 @@ int main(){
         i--;
     }
 
-    mainMenu();
+    menufn();
     return 0;
 }

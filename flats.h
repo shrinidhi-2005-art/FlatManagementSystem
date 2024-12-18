@@ -6,20 +6,20 @@ const char *dataset = "data.csv";
 int current = 100;
 //owners' struct
 typedef struct {
-    char name[50];
-    char o_info[50];
+    char *name;
+    char *o_info;
     float paid;
     float bal;
     float due;
-    char date[50];
+    char *date;
 }Owner;
 
 //flats' struct
 typedef struct {
-    char ID[10];
-    char type[10];
+    char *ID;
+    char *type;
     int price;
-    char status[10];
+    char *status;
     Owner *owner;
 }flat;
 
