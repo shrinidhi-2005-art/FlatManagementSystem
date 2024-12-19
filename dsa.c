@@ -40,23 +40,8 @@ int main(){
         i--;
     }
     read_file();
-    printf("\nfinshed\n");
 
     menufn();
-    // printf("\ndisplay_emi()\n");
-    // display_emi(50000);
-    // printf("\ndisplay_boooked()\n");
-    // display_booked();
-    // printf("\ndisplay_available()\n");
-    // display_available();
-    // printf("\nflatinfomenu()\n");
-    // flatinfoMenu();
-    // printf("\npaymentmenu()\n");
-    // paymentMenu();
-    // printf("\nBookmenu()\n");
-    // bookMenu();
-    // printf("\nsave()\n");
-    // save();
 
     return 0;
 }

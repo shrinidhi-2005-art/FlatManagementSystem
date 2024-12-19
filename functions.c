@@ -20,35 +20,6 @@ Owner* create_owner(){
     }
     return x;
 }
-
-
-// void read_file(){
-
-    
-
-//     FILE *file = fopen(dataset, "r");
-//     if (file == NULL){
-//         printf("error: couldn't open the file");
-//         return;
-//     }
-
-//     char header[150];
-//     fgets(header, sizeof(header), file); //this will make the function to ignore the 1st line in the csv.. idk how tho
-
-//     while(fscanf(file, "%9[^,],%9[^,],%d,%49[^,],%49[^,],%f,%f,%f,%49[^,],%14[\n]\n", flats.ID, flats.type, &flats.price, flats.owner->name, flats.owner->o_info, &flats.owner->paid, &flats.owner->bal, &flats.owner->due, flats.owner->date, flats.status)== 10){
-//         if (current>= size){
-//             printf("Error: Exceeded maximum residence capacity");
-//             break;
-//         }
-//         flats.owner = create_owner();
-//         residence[current++] = flats;
-//         printf("Read flat: %s, %s, %d, %s, %s, %.2f, %.2f, %.2f, %s, %s\n",
-//                flats.ID, flats.type, flats.price, flats.owner->name, flats.owner->o_info,
-//                flats.owner->paid, flats.owner->bal, flats.owner->due, flats.owner->date, flats.status);
-//     }
-//     fclose(file);
-// }
-
 void read_file() {
     // printf("Starting to read file.\n");
     FILE *file = fopen(dataset, "r");
@@ -59,7 +30,7 @@ void read_file() {
 
     char header[150];
     fgets(header, sizeof(header), file); // Ignorin the first line in the CSV
-    printf("Header: %s\n", header);
+    // printf("Header: %s\n", header);
 
     char line[300];
     current = 0; 
@@ -132,9 +103,9 @@ int display_emi(int price){
 }
 
 int confirmFlatID(char *id){
-    for(int i=0; i<current; i++){
-        if(strcmp(residence[i].ID, id)==0)
-            return i;
+    for(int i=0; i<size; i++){
+        if(strcmp(id, residence[i].ID)==0)
+            return 1;
     }
     return 0;
 }
@@ -142,7 +113,7 @@ int confirmFlatID(char *id){
 
 int book(char *id, char *name, char *contact){
     int ch;
-    for(int i=0; i<current; i++){
+    for(int i=0; i<size; i++){
         if(strcmp(residence[i].ID, id)==0){
             strcpy(residence[i].owner->name , name);
             strcpy(residence[i].owner->o_info , contact);
@@ -203,7 +174,7 @@ int book(char *id, char *name, char *contact){
 //this one's for to display the booked flats and the info 
 void display_booked(){
     printf("\n%-20s %-20s %-20s %-20s %-20s\n", "Flat ID", "Type", "Price", "Owner Name", "Contact info");
-    for(int i =0; i < current; i++){
+    for(int i =0; i < size; i++){
         if(strcmp(residence[i].status, "Booked")== 0){
             printf("%-20s %-20s %-20d %-20s %-20s\n", residence[i].ID, residence[i].type, residence[i].price, residence[i].owner->name, residence[i].owner->o_info);
         }
@@ -212,7 +183,7 @@ void display_booked(){
 
 void display_available(){
         printf("\n%-20s %-20s %-20s\n", "Flat ID", "Type", "Price");
-    for(int i =0; i < current/2.5; i++){
+    for(int i =0; i < size; i++){
         if(strcmp(residence[i].status, "Available")== 0){
             printf("%-20s %-20s %-20d\n", residence[i].ID, residence[i].type, residence[i].price);
         }
@@ -220,38 +191,43 @@ void display_available(){
 }
 
 int flatinfo(char *id){
-    for(int i=0; i<current; i++){
+    for(int i=0; i<size; i++){
         if(strcmp(id, residence[i].ID)==0){
             printf("\n%-10s %-20s %-20s\n", " ", "Flat no.:", residence[i].ID);
             
             if(strcmp(residence[i].status, "Booked")==0){
                 if(residence[i].owner->bal == 0){
-                    printf("%-20s %-20s %-20s\n", " ", "Owner:", residence[i].owner->name);
-                    printf("\n%-10s %-20s %-20s\n", " ", "Contact info:", residence[i].owner->o_info);
+                    printf("\n%-10s %-20s %-20s\n", " ", "Owner:", residence[i].owner->name);
+                    printf("%-10s %-20s %-20s\n", " ", "Contact info:", residence[i].owner->o_info);
                     printf("%-10s %-20s %-20s\n", " ", "Type:", residence[i].type);
-                    printf("\n%-10s %-20s %-20d\n", " ", "Price:", residence[i].price);
-                    printf("\n%-10s %-20s %-20s\n", " ", "Balance:", "00.00");
+                    printf("%-10s %-20s %-20d\n", " ", "Price:", residence[i].price);
+                    printf("%-10s %-20s %-20s\n", " ", "Balance:", "00.00");
                     return 1;
                 }
                 else{
-                    printf("%-20s %-20s %-20s\n", " ", "Owner:", residence[i].owner->name);
-                    printf("\n%-10s %-20s %-20s\n", " ", "Contact info:", residence[i].owner->o_info);
+                    printf("\n%-10s %-20s %-20s\n", " ", "Owner:", residence[i].owner->name);
+                    printf("%-10s %-20s %-20s\n", " ", "Contact info:", residence[i].owner->o_info);
                     printf("%-10s %-20s %-20s\n", " ", "Type:", residence[i].type);
-                    printf("\n%-10s %-20s %-20d\n", " ", "Price:", residence[i].price);
-                    printf("\n%-10s %-20s %-20.f\n", " ", "Balance:", residence[i].owner->bal);
-                    printf("\n%-10s %-20s %-20.2f\n", " ", "Due Next Month:", residence[i].owner->due);
-                    printf("\n%-10s %-20s %-20s\n", " ", "Due Date:", residence[i].owner->date);
+                    printf("%-10s %-20s %-20d\n", " ", "Price:", residence[i].price);
+                    printf("%-10s %-20s %-20.f\n", " ", "Balance:", residence[i].owner->bal);
+                    printf("%-10s %-20s %-20.2f\n", " ", "Due Next Month:", residence[i].owner->due);
+                    printf("%-10s %-20s %-20s\n", " ", "Due Date:", residence[i].owner->date);
                     return 2;
 
                 }
-            }      
+            } 
+            else{
+                printf("\n%-10s %-20s %-20s\n", " ", "Type:", residence[i].type);
+                printf("%-10s %-20s %-20d\n", " ", "Price:", residence[i].price);
+                return 3;
+            }     
         }
     }
     return 0;
 }
 
 void pay(char *id){
-    for(int i=0; i<current; i++){
+    for(int i=0; i<size; i++){
         if(strcmp(id, residence[i].ID)==0){
             residence[i].owner->paid += residence[i].owner->due;
             residence[i].owner->bal = residence[i].price - residence[i].owner->paid;
@@ -265,7 +241,6 @@ void pay(char *id){
         }
     }
 }
-
 
 void flatinfoMenu(){
     int ch;
@@ -315,7 +290,7 @@ void flatinfoMenu(){
             }while(1);
         }
         else if( x == 0){
-            errors(1);
+            errors(0);
         }
 
     }while(1);
@@ -384,23 +359,30 @@ void bookedMenu(){
 }
 
 void paymentMenu(){
-    char* id;
+    char id[10];
     int ch;
-    char* c;
+    int c;
     printf("\nPlease enter the flat ID: ");
     do{
         scanf("%s", id);
         if(confirmFlatID(id)!=0){
-            printf("\nPlease enter [y/Y] if the owner has paid his current due, else type [n/N]: ");
+            int x = flatinfo(id);
+            if(x== 1){
+                printf("\nThis flat has no due, no payment is required\n");
+                backToMenu();
+                return;
+            }
+            else if(x == 2){    
+                printf("\nPlease enter [y/Y] if the owner has paid his current due, else type [n/N]: ");
                 do{
-                    scanf("%c", c);
-                    if(strcmp(c,"y")==0||strcmp(c,"Y")==0){
+                    c = getc(stdin);
+                    if (c == 'y' || c == 'Y') {
                         pay(id);
                         printf("\nSuccessfully updated the records\n");
                         backToMenu();
                         return;
                     }
-                    else if(strcmp(c,"n")==0|| strcmp(c,"N")==0){
+                    else if (c == 'n' || c == 'N'){
                         printf("\nNo changes were made\n");
                         backToMenu();
                         return;
@@ -409,9 +391,28 @@ void paymentMenu(){
                         printf("\nPlease type [y/Y] or [n/N]: ");
                     }
                 }while(1);
+            }
+            else if(x == 3){
+                printf("\nThis flat is not yet booked, no payment is required\n");
+                backToMenu();
+                return;
+            }
         }
         else{
             errors(0);
+            printf("\n1. Try again\n2. Go back to main menu\nPlease choose an option: ");
+            do{
+                scanf("%d", &ch);
+                if(ch == 1){
+                    break;
+                }
+                else if(ch == 2){
+                    return;
+                }
+                else{
+                    errors(1);
+                }
+            }while(1);
         }
     }while(1);
 }
@@ -438,17 +439,21 @@ void errors(int value){
     }
 }
 
-void backToMenu(){
+void backToMenu() {
     int ch;
-    printf("\n type 0 to return to the main menu: ");
-    do{
-        scanf("%d", &ch);  
-        if(ch == 0)
-            return;
-        else{
-            printf("Please try again: ");
-        }                
-    }while(1);
+    printf("\ntype 0 to return to the main menu: ");
+    while (1) {
+        if (scanf("%d", &ch) == 1) { 
+            if (ch == 0) {
+                return;
+            } else {
+                printf("Please try again: ");
+            }
+        } else {
+            while (getchar() != '\n');
+            printf("Invalid input. Please enter zero(0)  to go back to the main menu: ");
+        }
+    }
 }
 
 //  MAIN MENU 
@@ -470,8 +475,8 @@ void menufn(){
         switch(ch){
             case 1: flatinfoMenu(); break;
             case 2: bookMenu(); break;
-            case 3: availableMenu(); break;
-            case 4: backToMenu(); break;
+            case 3: bookedMenu(); break;
+            case 4: availableMenu(); break;
             case 5: paymentMenu(); break;
             case 6: save(); exit(0);
             default: printf("\nWrong choice, try again"); break;
