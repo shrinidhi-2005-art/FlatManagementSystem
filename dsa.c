@@ -40,6 +40,8 @@ int main(){
         i--;
     }
     read_file();
+    printf("\nfinshed\n");
+
     menufn();
     // printf("\ndisplay_emi()\n");
     // display_emi(50000);

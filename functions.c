@@ -22,30 +22,67 @@ Owner* create_owner(){
 }
 
 
-void read_file(){
+// void read_file(){
 
-    flats.owner = create_owner();
+    
 
+//     FILE *file = fopen(dataset, "r");
+//     if (file == NULL){
+//         printf("error: couldn't open the file");
+//         return;
+//     }
+
+//     char header[150];
+//     fgets(header, sizeof(header), file); //this will make the function to ignore the 1st line in the csv.. idk how tho
+
+//     while(fscanf(file, "%9[^,],%9[^,],%d,%49[^,],%49[^,],%f,%f,%f,%49[^,],%14[\n]\n", flats.ID, flats.type, &flats.price, flats.owner->name, flats.owner->o_info, &flats.owner->paid, &flats.owner->bal, &flats.owner->due, flats.owner->date, flats.status)== 10){
+//         if (current>= size){
+//             printf("Error: Exceeded maximum residence capacity");
+//             break;
+//         }
+//         flats.owner = create_owner();
+//         residence[current++] = flats;
+//         printf("Read flat: %s, %s, %d, %s, %s, %.2f, %.2f, %.2f, %s, %s\n",
+//                flats.ID, flats.type, flats.price, flats.owner->name, flats.owner->o_info,
+//                flats.owner->paid, flats.owner->bal, flats.owner->due, flats.owner->date, flats.status);
+//     }
+//     fclose(file);
+// }
+
+void read_file() {
+    // printf("Starting to read file.\n");
     FILE *file = fopen(dataset, "r");
-    if (file == NULL){
-        printf("error: couldn't open the file");
+    if (file == NULL) {
+        printf("error: couldn't open the file\n");
         return;
     }
 
     char header[150];
-    fgets(header, sizeof(header), file); //this will make the function to ignore the 1st line in the csv.. idk how tho
+    fgets(header, sizeof(header), file); // Ignorin the first line in the CSV
+    printf("Header: %s\n", header);
 
-    while(fscanf(file, "%9[^,],%9[^,],%d,%49[^,],%49[^,],%f,%f,%f,%49[^,],%14[\n]\n", flats.ID, flats.type, &flats.price, flats.owner->name, flats.owner->o_info, &flats.owner->paid, &flats.owner->bal, &flats.owner->due, flats.owner->date, flats.status)== 10){
-        if (current>= size){
-            printf("Error: Exceeded maximum residence capacity");
-            break;
+    char line[300];
+    current = 0; 
+    while (fgets(line, sizeof(line), file)) {
+        // printf("Line: %s\n", line);
+        flats.owner = create_owner(); 
+        if (sscanf(line, "%9[^,],%9[^,],%d,%49[^,],%49[^,],%f,%f,%f,%49[^,],%s", flats.ID, flats.type, &flats.price, flats.owner->name, flats.owner->o_info, &flats.owner->paid, &flats.owner->bal, &flats.owner->due, flats.owner->date, flats.status) == 10) {
+            if (current >= size) {
+                printf("Error: Exceeded maximum residence capacity\n");
+                break;
+            }
+            residence[current++] = flats;
+            // printf("Read flat: %s, %s, %d, %s, %s, %.2f, %.2f, %.2f, %s, %s\n",
+            //        flats.ID, flats.type, flats.price, flats.owner->name, flats.owner->o_info,
+            //        flats.owner->paid, flats.owner->bal, flats.owner->due, flats.owner->date, flats.status);
+        } else {
+            printf("Failed to parse line: %s\n", line);
+            printf("line: %s\n", line);
         }
-        residence[current++] = flats;
     }
     fclose(file);
+    printf("Loading the main menu...\n");
 }
-
-
 //This one will overwrite the whole thing (i mean file)
 void write_file(){
     FILE *file = fopen(dataset, "w");

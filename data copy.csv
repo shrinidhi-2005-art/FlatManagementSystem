@@ -1,4 +1,4 @@
-Flat ID,Type,Price,Owner Name,Contact Info,Amount Paid So Far (₹),Remaining Balance (₹),Next Monthly Installment (₹),Due Date,Status
+Flat ID,Type,Price,Owner Name,Contact Info,Amount Paid So Far,Remaining Balance,Next Monthly Installment,Due Date,Status
 FLT001,1BHK,1000000,John Doe,+91XXXXXXXXXX,50000,950000,25000,2024-12-30,Booked
 FLT002,1BHK,1000000,NULL,NULL,0,0,0,NULL,Available
 FLT003,1BHK,1000000,NULL,NULL,0,0,0,NULL,Available
