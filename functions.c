@@ -52,7 +52,7 @@ void read_file() {
         }
     }
     fclose(file);
-    printf("Loading the main menu...\n");
+    printf("\nLoading the main menu...Please Wait\n");
 }
 //This one will overwrite the whole thing (i mean file)
 void write_file(){
@@ -78,10 +78,10 @@ float down(int price, float value){
 float principal(int price, float down){
     return price-down;
 }
-float emi(float p, int i, int y){
-    i /= 12;
-    y *= 12;
-    float emi = (p*i*(pow((1+i), y)))/(pow((1+i), y)-1);
+float emi(float p, int i, int y) {
+    float m = (float)i / 12 / 100;
+    int n = y * 12; 
+    float emi = (p * m * pow(1 + m, n)) / (pow(1 + m, n) - 1);
     return emi;
 }
 
@@ -103,17 +103,17 @@ int display_emi(int price){
 }
 
 int confirmFlatID(char *id){
-    for(int i=0; i<size; i++){
+    for(int i=0; i<current; i++){
         if(strcmp(id, residence[i].ID)==0)
-            return 1;
+            return i;
     }
-    return 0;
+    return -1;
 }
 
 
 int book(char *id, char *name, char *contact){
     int ch;
-    for(int i=0; i<size; i++){
+    for(int i=0; i<current; i++){
         if(strcmp(residence[i].ID, id)==0){
             strcpy(residence[i].owner->name , name);
             strcpy(residence[i].owner->o_info , contact);
@@ -121,8 +121,9 @@ int book(char *id, char *name, char *contact){
             do{
                 scanf("%d", &ch);
                 if (ch == 1){
-                    printf("Successfully created a record, in the name of %s with flat id %s", residence[i].owner->name, residence[i].ID);
+                    printf("\nSuccessfully created a record, in the name of %s with flat id %s\n", residence[i].owner->name, residence[i].ID);
                     strcpy(residence[i].status , "Booked");
+                    residence[i].owner->paid = residence[i].price;
                     return 1;
                 }
                 else if (ch == 2){
@@ -135,7 +136,7 @@ int book(char *id, char *name, char *contact){
                         residence[i].owner->bal = residence[i].price - residence[i].owner->paid;
                         residence[i].owner->due = emi(principal(residence[i].price, down(residence[i].price, 20)), 7, 5);
                         strcpy(residence[i].owner->date , "1/1/2024");
-                        printf("Successfully created a record, in the name of %s with flat id %s, your next due, %.2f, is on %s", residence[i].owner->name, residence[i].ID,residence[i].owner->due,residence[i].owner->date);
+                        printf("\nSuccessfully created a record, in the name of %s with flat id %s, your next due, %.2f, is on %s\n", residence[i].owner->name, residence[i].ID,residence[i].owner->due,residence[i].owner->date);
                         return 1;
                     }
                     else if (e == 2){
@@ -146,7 +147,7 @@ int book(char *id, char *name, char *contact){
                         residence[i].owner->bal = residence[i].price - residence[i].owner->paid;
                         residence[i].owner->due = emi(principal(residence[i].price, down(residence[i].price, 25)), 7.5, 6);
                         strcpy(residence[i].owner->date , "1/1/2024");
-                        printf("Successfully created a record, in the name of %s with flat id %s, your next due, %.2f, is on %s", residence[i].owner->name, residence[i].ID,residence[i].owner->due,residence[i].owner->date);
+                        printf("\nSuccessfully created a record, in the name of %s with flat id %s, your next due, %.2f, is on %s\n", residence[i].owner->name, residence[i].ID,residence[i].owner->due,residence[i].owner->date);
                         return 1;
                     }
                     else if (e == 3){
@@ -157,7 +158,7 @@ int book(char *id, char *name, char *contact){
                         residence[i].owner->bal = residence[i].price - residence[i].owner->paid;
                         residence[i].owner->due = emi(principal(residence[i].price, down(residence[i].price, 30)), 8, 7);
                         strcpy(residence[i].owner->date , "1/1/2024");
-                        printf("Successfully created a record, in the name of %s with flat id %s, your next due, %.2f, is on %s", residence[i].owner->name, residence[i].ID,residence[i].owner->due,residence[i].owner->date);
+                        printf("\n Successfully created a record, in the name of %s with flat id %s, your next due, %.2f, is on %s\n", residence[i].owner->name, residence[i].ID,residence[i].owner->due,residence[i].owner->date);
                         return 1;
                     }
                 }
@@ -174,7 +175,7 @@ int book(char *id, char *name, char *contact){
 //this one's for to display the booked flats and the info 
 void display_booked(){
     printf("\n%-20s %-20s %-20s %-20s %-20s\n", "Flat ID", "Type", "Price", "Owner Name", "Contact info");
-    for(int i =0; i < size; i++){
+    for(int i =0; i < current; i++){
         if(strcmp(residence[i].status, "Booked")== 0){
             printf("%-20s %-20s %-20d %-20s %-20s\n", residence[i].ID, residence[i].type, residence[i].price, residence[i].owner->name, residence[i].owner->o_info);
         }
@@ -183,7 +184,7 @@ void display_booked(){
 
 void display_available(){
         printf("\n%-20s %-20s %-20s\n", "Flat ID", "Type", "Price");
-    for(int i =0; i < size; i++){
+    for(int i =0; i < current; i++){
         if(strcmp(residence[i].status, "Available")== 0){
             printf("%-20s %-20s %-20d\n", residence[i].ID, residence[i].type, residence[i].price);
         }
@@ -191,13 +192,13 @@ void display_available(){
 }
 
 int flatinfo(char *id){
-    for(int i=0; i<size; i++){
+    for(int i=0; i<current; i++){
         if(strcmp(id, residence[i].ID)==0){
             printf("\n%-10s %-20s %-20s\n", " ", "Flat no.:", residence[i].ID);
             
             if(strcmp(residence[i].status, "Booked")==0){
                 if(residence[i].owner->bal == 0){
-                    printf("\n%-10s %-20s %-20s\n", " ", "Owner:", residence[i].owner->name);
+                    printf("%-10s %-20s %-20s\n", " ", "Owner:", residence[i].owner->name);
                     printf("%-10s %-20s %-20s\n", " ", "Contact info:", residence[i].owner->o_info);
                     printf("%-10s %-20s %-20s\n", " ", "Type:", residence[i].type);
                     printf("%-10s %-20s %-20d\n", " ", "Price:", residence[i].price);
@@ -205,7 +206,7 @@ int flatinfo(char *id){
                     return 1;
                 }
                 else{
-                    printf("\n%-10s %-20s %-20s\n", " ", "Owner:", residence[i].owner->name);
+                    printf("%-10s %-20s %-20s\n", " ", "Owner:", residence[i].owner->name);
                     printf("%-10s %-20s %-20s\n", " ", "Contact info:", residence[i].owner->o_info);
                     printf("%-10s %-20s %-20s\n", " ", "Type:", residence[i].type);
                     printf("%-10s %-20s %-20d\n", " ", "Price:", residence[i].price);
@@ -217,7 +218,7 @@ int flatinfo(char *id){
                 }
             } 
             else{
-                printf("\n%-10s %-20s %-20s\n", " ", "Type:", residence[i].type);
+                printf("%-10s %-20s %-20s\n", " ", "Type:", residence[i].type);
                 printf("%-10s %-20s %-20d\n", " ", "Price:", residence[i].price);
                 return 3;
             }     
@@ -227,15 +228,15 @@ int flatinfo(char *id){
 }
 
 void pay(char *id){
-    for(int i=0; i<size; i++){
+    for(int i=0; i<current; i++){
         if(strcmp(id, residence[i].ID)==0){
             residence[i].owner->paid += residence[i].owner->due;
             residence[i].owner->bal = residence[i].price - residence[i].owner->paid;
             residence[i].owner->due = 00.00;
             strcpy(residence[i].owner->date , "1/2/2024");
-            printf("\nChanges recorded on Flat number %s\n updated details:\n", residence[i].ID );
-            printf("\n%-10s %-20s %-20.2f\n", " ", "Balance:", residence[i].owner->bal);
-            printf("\n%-10s %-20s %-20.2f\n", " ", "Due Next Month:", residence[i].owner->due);
+            printf("\nChanges recorded on Flat number %s\n\nUpdated details:\n", residence[i].ID );
+            printf("\n%-10s %-20s %-20.2f", " ", "Balance:", residence[i].owner->bal);
+            printf("\n%-10s %-20s %-20.2f", " ", "Due Next Month:", residence[i].owner->due);
             printf("\n%-10s %-20s %-20s\n", " ", "Due Date:", residence[i].owner->date);
             
         }
@@ -246,7 +247,8 @@ void flatinfoMenu(){
     int ch;
     char c;
     char id[10];
-    printf("\nType the flat ID: ");
+    printf("\n%-10s %s\n\n", " ","-----Flat Information Menu-----");
+    printf("\n%-10s %s", " ", "Please enter the flat ID: ");
     do{
         scanf("%s",id);
         int x = flatinfo(id);
@@ -265,8 +267,9 @@ void flatinfoMenu(){
                 if(ch == 1){
                     printf("\nPlease enter [y/Y] if the owner has paid his current due, else type [n/N]: ");
                     do{
-                        scanf("%c", &c);
-                        if(c=='y'||c=='Y'){
+                        while ((c = getchar()) != '\n');
+                        c = getchar();
+                        if (c == 'y' || c == 'Y') {
                             pay(id);
                             backToMenu();
                             return;
@@ -289,8 +292,10 @@ void flatinfoMenu(){
                 }
             }while(1);
         }
-        else if( x == 0){
-            errors(0);
+        else if( x == 3){
+            printf("%-10s\n" , "Not Booked yet!");
+            backToMenu();
+            return;
         }
 
     }while(1);
@@ -298,14 +303,14 @@ void flatinfoMenu(){
 
 void bookMenu(){
     int ch;
- 
-    char *id;
+    char id[10];
     char name[50];
     char contact[50];
-    printf("\nType the flat ID: ");
+    printf("\n%-10s %-40s\n\n", "-----Book a New Flat -----");
+    printf("Type the flat ID: ");
     do{
-        scanf("%s",id);
-        if (confirmFlatID(id)!=0){
+        scanf("%s", id);
+        if (confirmFlatID(id)!=-1){
             if (strcmp(residence[confirmFlatID(id)].status, "Booked")== 0){
                 printf("\nThis Flat is already Booked in the name of %s\n", residence[confirmFlatID(id)].owner->name);
                 printf("1. try again if your flat ID was wrong \n2. check the list of available flats\n3. Go back to main menu \nPlease choose an option: ");
@@ -330,10 +335,10 @@ void bookMenu(){
             else{
                 printf("\nPlease enter your name: ");
                 scanf("%s", name);
-                printf("\nPlease enter your contact number: ");
+                printf("Please enter your contact number: ");
                 scanf("%s", contact);
                 book(id, name, contact);
-                printf("\nsuccessfully Booked!\n");
+                printf("\nsuccessfully Booked The Flat!!\n");
                 backToMenu();
                 return;
             }
@@ -361,11 +366,11 @@ void bookedMenu(){
 void paymentMenu(){
     char id[10];
     int ch;
-    int c;
+    char c;
     printf("\nPlease enter the flat ID: ");
     do{
         scanf("%s", id);
-        if(confirmFlatID(id)!=0){
+        if(confirmFlatID(id)!=-1){
             int x = flatinfo(id);
             if(x== 1){
                 printf("\nThis flat has no due, no payment is required\n");
@@ -375,7 +380,8 @@ void paymentMenu(){
             else if(x == 2){    
                 printf("\nPlease enter [y/Y] if the owner has paid his current due, else type [n/N]: ");
                 do{
-                    c = getc(stdin);
+                    while ((c = getchar()) != '\n');
+                    c = getchar();
                     if (c == 'y' || c == 'Y') {
                         pay(id);
                         printf("\nSuccessfully updated the records\n");
@@ -470,7 +476,7 @@ void menufn(){
         printf("4. List Available flats\n");
         printf("5. Update payment of a flat\n");
         printf("6. Save and logout\n");
-        printf("Please select an option: ");
+        printf("\nPlease select an option: ");
         scanf("%d", &ch);
         switch(ch){
             case 1: flatinfoMenu(); break;

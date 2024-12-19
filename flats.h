@@ -1,6 +1,6 @@
 #ifndef FLATS_H
 #define FLATS_H
-#define size 101
+#define size 100
 
 extern const char dataset[50];
 extern int current;
