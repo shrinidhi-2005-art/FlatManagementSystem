@@ -4,15 +4,11 @@
 #include<math.h>
 #include "flats.h"
 #include "functions.h"
-//i'll do the functions parttttt
 
 flat flats;
 
-
 //this will read the file and store the data inside array named residence (check flats.h)
-
 Owner* create_owner(){
-        //allocatin memory for owners
     Owner* x = (Owner *)malloc(sizeof(Owner));
     if(x == NULL){
         printf("Memory allocation failed");
@@ -20,8 +16,9 @@ Owner* create_owner(){
     }
     return x;
 }
+
+//Reads the file (data.csv) and saves it to the memory (residence array)
 void read_file() {
-    // printf("Starting to read file.\n");
     FILE *file = fopen(dataset, "r");
     if (file == NULL) {
         printf("error: couldn't open the file\n");
@@ -29,40 +26,32 @@ void read_file() {
     }
 
     char header[150];
-    fgets(header, sizeof(header), file); // Ignorin the first line in the CSV
-    // printf("Header: %s\n", header);
-
+    fgets(header, sizeof(header), file);  // Ignorin the first line in the CSV file ('Cause it has headings, which is unnecessery)
     char line[300];
-    current = 0; 
-    while (fgets(line, sizeof(line), file)) {
-        // printf("Line: %s\n", line);
+    while (fgets(line, sizeof(line), file)) { 
         flats.owner = create_owner(); 
         if (sscanf(line, "%9[^,],%9[^,],%d,%49[^,],%49[^,],%f,%f,%f,%49[^,],%s", flats.ID, flats.type, &flats.price, flats.owner->name, flats.owner->o_info, &flats.owner->paid, &flats.owner->bal, &flats.owner->due, flats.owner->date, flats.status) == 10) {
             if (current >= size) {
                 printf("Error: Exceeded maximum residence capacity\n");
                 break;
             }
-            residence[current++] = flats;
-            // printf("Read flat: %s, %s, %d, %s, %s, %.2f, %.2f, %.2f, %s, %s\n",
-            //        flats.ID, flats.type, flats.price, flats.owner->name, flats.owner->o_info,
-            //        flats.owner->paid, flats.owner->bal, flats.owner->due, flats.owner->date, flats.status);
+            residence[current++] = flats; // increasing the current value (from 0 (in dsa.c file)) till the loop ends... (It'll store the total number of Lines in the file and, residence array will move to the next structure element to save the data)
         } else {
             printf("Failed to parse line: %s\n", line);
-            printf("line: %s\n", line);
+            printf("line: %s\n", line); //upon error reading the file, it'll just print this
         }
     }
     fclose(file);
     printf("\nLoading the main menu...Please Wait\n");
 }
-//This one will overwrite the whole thing (i mean file)
+//This one will overwrite the whole thing (i mean the file) - ie., we're using it in the end of the program to save the data that we fetched/edited during the runtime... so, we'll be erasing the previous data in .csv file and rewrite everything that we've inside the memory (residence array)
 void write_file(){
     FILE *file = fopen(dataset, "w");
         if (file == NULL){
             printf("error: couldn't open the file");
             return;
         }
-    
-    fprintf(file, "Flat ID,Type,Price,Owner Name,Contact Info,Amount Paid So Far (₹),Remaining Balance (₹),Next Monthly Installment (₹),Due Date,Status\n");
+    fprintf(file, "Flat ID,Type,Price,Owner Name,Contact Info,Amount Paid So Far,Remaining Balance,Next Monthly Installment,Due Date,Status\n");
 
     for(int i=0; i<current; i++){
         fprintf(file, "%s,%s,%d,%s,%s,%.2f,%.2f,%.2f,%s,%s\n",residence[i].ID, residence[i].type, residence[i].price, residence[i].owner->name, residence[i].owner->o_info, residence[i].owner->paid, residence[i].owner->bal, residence[i].owner->due, residence[i].owner->date, residence[i].status  );
@@ -71,13 +60,18 @@ void write_file(){
 
 }
 
+//calculates the downpayment amount by fetching price of the flat and the % of downpayment
 float down(int price, float value){
     price = (price*value)/100;
     return price;
 }
+
+//calculate the principal amount of the loan/emi using downpayment and price of the flat
 float principal(int price, float down){
     return price-down;
 }
+
+//calculates the emi of the flat by using p-principal, i-intrest per annum, y-years left for repayment of the loan
 float emi(float p, int i, int y) {
     float m = (float)i / 12 / 100;
     int n = y * 12; 
@@ -85,6 +79,7 @@ float emi(float p, int i, int y) {
     return emi;
 }
 
+//displays the emi option inside booking menu, when u book a flat and choose emi option
 int display_emi(int price){
     int ch;
     printf("\nPlease Choose Any of the EMI options from below\n");
@@ -98,10 +93,14 @@ int display_emi(int price){
         printf("\n%-20s %-10.2f\n%-20s %-10.2f\n%-20s %-20s\n%-20s %-20s\n%-20s %.2f\n", "Down Payment:", down(price, 30), "Loan Amount:", principal(price, down(price, 30)), "EMI Tenure:", "7 Years", "Interest Rate:", "8%% annually", "EMI:", emi(principal(price, down(price, 30)), 8, 7) );
 
         printf("Please choose a plan: ");
-        scanf("%d", &ch);
-        return ch;
+        while((scanf("%d", &ch)!=1)){ //when u just give scanf and use %d as format specifier, or %f or smtng which isnt a char... if u happend to type a char in the input feild when it is prompted,  the code will go infinite loop, or any unwanted errors.. so using a while loop with having a condition that it should run until the input returns 0 (ie., true - a integer has been typed), and returns error message when the condition is met, else it'll just save the input in variable 'ch' and exites the while loop
+            while (getchar() != '\n'); //this is to clear the buffer if it has a newline character (also, if unseen, might cause errors)
+            errors(1); //calls errors function which has errors with own value...errors(1) shows, that there are no flats with the given id or errors(2) shows, that the value entered is wrong (the choice)
+        }
+    return ch;
 }
 
+//confirms the flat ID if it exists or not, if exist it'll return the index of array which the flat present in, else, -1
 int confirmFlatID(char *id){
     for(int i=0; i<current; i++){
         if(strcmp(id, residence[i].ID)==0)
@@ -110,7 +109,7 @@ int confirmFlatID(char *id){
     return -1;
 }
 
-
+//books the flat and asks whether the customer wants to do full on payment or pay using emi
 int book(char *id, char *name, char *contact){
     int ch;
     for(int i=0; i<current; i++){
@@ -119,7 +118,10 @@ int book(char *id, char *name, char *contact){
             strcpy(residence[i].owner->o_info , contact);
             printf("\nPayment method: 1. Full on payment    2. Pay with EMI\nEnter your choice: ");
             do{
-                scanf("%d", &ch);
+                while((scanf("%d", &ch)!=1)){
+                while (getchar() != '\n');
+                errors(1);
+                }
                 if (ch == 1){
                     printf("\nSuccessfully created a record, in the name of %s with flat id %s\n", residence[i].owner->name, residence[i].ID);
                     strcpy(residence[i].status , "Booked");
@@ -128,7 +130,7 @@ int book(char *id, char *name, char *contact){
                 }
                 else if (ch == 2){
                     int e = display_emi(residence[i].price);
-                    if (e == 1){
+                    if (e == 1){ //in emi funtion, the 1st emi option returns 1
                         strcpy(residence[i].status , "Booked");
                         strcpy(residence[i].owner->name , name);
                         strcpy(residence[i].owner->o_info , contact);
@@ -139,7 +141,7 @@ int book(char *id, char *name, char *contact){
                         printf("\nSuccessfully created a record, in the name of %s with flat id %s, your next due, %.2f, is on %s\n", residence[i].owner->name, residence[i].ID,residence[i].owner->due,residence[i].owner->date);
                         return 1;
                     }
-                    else if (e == 2){
+                    else if (e == 2){ //2nd emi option returns 2
                         strcpy(residence[i].status , "Booked");
                         strcpy(residence[i].owner->name , name);
                         strcpy(residence[i].owner->o_info , contact);
@@ -150,7 +152,7 @@ int book(char *id, char *name, char *contact){
                         printf("\nSuccessfully created a record, in the name of %s with flat id %s, your next due, %.2f, is on %s\n", residence[i].owner->name, residence[i].ID,residence[i].owner->due,residence[i].owner->date);
                         return 1;
                     }
-                    else if (e == 3){
+                    else if (e == 3){ //3rd emioption returns 3
                         strcpy(residence[i].status , "Booked");
                         strcpy(residence[i].owner->name , name);
                         strcpy(residence[i].owner->o_info , contact);
@@ -163,7 +165,7 @@ int book(char *id, char *name, char *contact){
                     }
                 }
                 else{
-                    errors(1);
+                    errors(1); 
                 }
             }while(1);
         }
@@ -172,7 +174,7 @@ int book(char *id, char *name, char *contact){
     
 }
 
-//this one's for to display the booked flats and the info 
+//this one is for to display the booked flats and the info
 void display_booked(){
     printf("\n%-20s %-20s %-20s %-20s %-20s\n", "Flat ID", "Type", "Price", "Owner Name", "Contact info");
     for(int i =0; i < current; i++){
@@ -182,6 +184,7 @@ void display_booked(){
     }
 }
 
+//shows the available flats (flats which are not booked)
 void display_available(){
         printf("\n%-20s %-20s %-20s\n", "Flat ID", "Type", "Price");
     for(int i =0; i < current; i++){
@@ -191,6 +194,7 @@ void display_available(){
     }
 }
 
+//shows the flat info and returns 1 if the flat has 0 bal to be paid, 2 if it has some amount left to be cleared, 3 if it is not yet booked, 0 if the search was failed
 int flatinfo(char *id){
     for(int i=0; i<current; i++){
         if(strcmp(id, residence[i].ID)==0){
@@ -227,6 +231,7 @@ int flatinfo(char *id){
     return 0;
 }
 
+//this one will pays the next due amount of the flat (if there's)
 void pay(char *id){
     for(int i=0; i<current; i++){
         if(strcmp(id, residence[i].ID)==0){
@@ -243,6 +248,7 @@ void pay(char *id){
     }
 }
 
+//The menu funtion for Flat Info
 void flatinfoMenu(){
     int ch;
     char c;
@@ -263,7 +269,10 @@ void flatinfoMenu(){
             printf("2. return to main menu\n");
             printf("Please choose any options from above: ");
             do{
-                scanf("%d", &ch);
+                while((scanf("%d", &ch)!=1)){
+                while (getchar() != '\n');
+                errors(1);
+                }
                 if(ch == 1){
                     printf("\nPlease enter [y/Y] if the owner has paid his current due, else type [n/N]: ");
                     do{
@@ -280,7 +289,7 @@ void flatinfoMenu(){
                             return;
                         }
                         else{
-                            printf("\nPlease type [y/Y] or [n/N]: ");
+                            printf("\nERROR: Please type [y/Y] or [n/N]: ");
                         }
                     }while(1);
                 }
@@ -301,12 +310,13 @@ void flatinfoMenu(){
     }while(1);
 }
 
+//Menu funtion for Booking the Flat
 void bookMenu(){
     int ch;
     char id[10];
     char name[50];
     char contact[50];
-    printf("\n%-10s %-40s\n\n", "-----Book a New Flat -----");
+    printf("\n%-10s %s\n\n", " ","-----Book A New Flat-----");
     printf("Type the flat ID: ");
     do{
         scanf("%s", id);
@@ -351,18 +361,21 @@ void bookMenu(){
     return; 
 }
 
+//Menu funtion that shows the available flats and used backtomenu funtion to prompt the user to go back to the main menu
 void availableMenu(){
     display_available();
     backToMenu();
     return;
 }
 
+//Menu funtion that shows the Booked flats and used backtomenu funtion to prompt the user to go back to the main menu
 void bookedMenu(){
     display_booked();
     backToMenu();
     return;
 }
 
+//Menu funtion to manage payment of the flats which has due... uses pay() funtion.
 void paymentMenu(){
     char id[10];
     int ch;
@@ -394,7 +407,7 @@ void paymentMenu(){
                         return;
                     }
                     else{
-                        printf("\nPlease type [y/Y] or [n/N]: ");
+                        printf("\nERROR: Please type [y/Y] or [n/N]: ");
                     }
                 }while(1);
             }
@@ -408,7 +421,10 @@ void paymentMenu(){
             errors(0);
             printf("\n1. Try again\n2. Go back to main menu\nPlease choose an option: ");
             do{
-                scanf("%d", &ch);
+                while((scanf("%d", &ch)!=1)){
+                while (getchar() != '\n');
+                errors(1);
+                }
                 if(ch == 1){
                     break;
                 }
@@ -423,7 +439,9 @@ void paymentMenu(){
     }while(1);
 }
 
+//saves the whole data into the csv file... 
 void save(){
+    
     printf("\nSaving changes....\n");
     write_file();
     free(flats.owner);
@@ -431,6 +449,7 @@ void save(){
     return;
 }
 
+//errors. 0 for Wrong or unsuccessfull search of Flat with the given ID and 1 for wrong choice
 void errors(int value){
     if (value == 0){
         printf("\nCouldn't find the flat with that ID, please try again: ");
@@ -445,25 +464,27 @@ void errors(int value){
     }
 }
 
+//Function which prompts to the user whether he wants to go back to the main menu..
 void backToMenu() {
     int ch;
     printf("\ntype 0 to return to the main menu: ");
     while (1) {
-        if (scanf("%d", &ch) == 1) { 
+        if (scanf("%d", &ch) == 1 ) { 
             if (ch == 0) {
                 return;
-            } else {
-                printf("Please try again: ");
+            } 
+            else {
+                errors(1);
             }
-        } else {
+        }
+        else {
             while (getchar() != '\n');
-            printf("Invalid input. Please enter zero(0)  to go back to the main menu: ");
+            errors(1);
         }
     }
 }
 
-//  MAIN MENU 
-
+//  MAIN MENU funtion. 
 void menufn(){
     int ch;
     char c;
@@ -477,7 +498,10 @@ void menufn(){
         printf("5. Update payment of a flat\n");
         printf("6. Save and logout\n");
         printf("\nPlease select an option: ");
-        scanf("%d", &ch);
+        while((scanf("%d", &ch)!=1)){
+            while (getchar() != '\n');
+            errors(1);
+        }
         switch(ch){
             case 1: flatinfoMenu(); break;
             case 2: bookMenu(); break;
@@ -485,7 +509,7 @@ void menufn(){
             case 4: availableMenu(); break;
             case 5: paymentMenu(); break;
             case 6: save(); exit(0);
-            default: printf("\nWrong choice, try again"); break;
+            default: errors(1); break;
         }
     }
 }

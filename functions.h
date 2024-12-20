@@ -1,6 +1,8 @@
 #ifndef FUNCTIONS_H
 #define FUNCTION_H
 
+//just declaring all the functions inside a single file instead of that main file
+
 void read_file(void);
 void write_file(void);
 float down(int, float);
@@ -21,6 +23,5 @@ void save();
 void errors(int);
 void backToMenu();
 void menufn();
-
 
 #endif
