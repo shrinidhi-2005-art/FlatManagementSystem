@@ -4,44 +4,42 @@
 #include "functions.h"
 #include "flats.h"
 
+const char dataset[50] = "data.csv";
+int current = 0; 
+flat residence[size];
 
 int main(){
-
-//declare things....
-    //for login: 
-    char user[5];
+    char user[10];
     int pass, i=2;
 
-
-//Login page thing...
-
-printf("--------Welcome to Flat Management System--------\n       Please Login to continue:\n");
-printf("\n          Username: ");
-scanf("%4s", user);
-printf("\n          password: ");
-while(1){
-    scanf("%d",&pass);
-    if(i==0){
-        printf("Sorry, Maximum Number Of Attempts Has Reached");
-        exit(0);
+    //Login page
+    printf("--------Welcome to Flat Management System--------\n\n         Please Login to continue:\n");
+    printf("%-10s %s", " ", "Username: "); //type wtvr u want but below 10 chars
+    scanf("%9s", user);
+    printf("%-10s %s", " ", "Password: "); //type the password : 1234 ('cause its what i checked in if condition below...)
+    while(1){
+        while((scanf("%d", &pass)!=1)){
+            while (getchar() != '\n');
+            printf("\nPassword should be in Digits!!\n");
+            printf("Try again: ");
+        }
+        if(i==0){
+            printf("Sorry, Maximum Number Of Attempts Has Reached");
+            exit(0);
+        }
+        if (pass != 1234){
+            printf("Incorrect Password, Try again: (%d attempts left)\n", i);
+            printf("%-10s %s", " ", "Password: ");
+        }
+        else{
+            printf("\n--------Successfully Logged In--------\n");
+            break;
+        }
+        i--;//decreases the amount of attempts after each tries
     }
-    if (pass != 1234){
-        printf("\nIncorrect Password, Try again (%d attempts left)\n", i);
-        printf("\n          password: ");
-    }
-    else{
-        printf("\n--------Successfully Logged In--------");
-        break;
-    }
-    i--;
-}
 
-//rest of the code
+    read_file(); //reads the file data.csv and saves all the info to the RAM (residence array)
+    menufn(); //calls the main menu funtion
 
-//menu for the administrator
-//use comments wherever u wanna call fucntions
-//just do the menu and log out option...
-//add whatever features u want and call the functions as comments, i'll just write the functions... try to explain about the function using comments
-//thanks hehe
-return 0;
+    return 0;
 }
