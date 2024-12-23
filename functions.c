@@ -40,19 +40,13 @@ void read_file() {
         if(strcmp(status, "Booked")==0){
             flats.owner = create_owner(); 
 
-            printf("\ncheck 2 Pass\n");
-
             if (sscanf(line, "%9[^,],%9[^,],%9[^,],%d,%49[^,],%49[^,],%f,%f,%f,%s", flats.status, flats.ID, flats.type, &flats.price, flats.owner->name, flats.owner->o_info, &flats.owner->paid, &flats.owner->bal, &flats.owner->due, flats.owner->date) == 10) {
                 if (current >= size) {
                     printf("Error: Exceeded maximum residence capacity\n");
                     break;
                     }
-
-            printf("\ncheck 3 Pass\n");
-
             residence[current++] = flats; // increasing the current value (from 0 (in dsa.c file)) till the loop ends... (It'll store the total number of Lines in the file and, residence array will move to the next structure element to save the data)
             }
-            printf("\ncheck 4 Pass\n");
         }
         
         else if (strcmp(status, "Available")==0){
@@ -82,15 +76,18 @@ void write_file(){
             return;
         }
     fprintf(file, "Status,Flat ID,Type,Price,Owner Name,Contact Info,Amount Paid So Far,Remaining Balance,Next Monthly Installment,Due Date\n");
-    int k =0, j=0;
+    char line[300];
     for(int i=0; i<current; i++){
         if(strcmp(residence[i].status, "Booked")==0){
-            fprintf(file, "%s,%s,%s,%d,%s,%s,%.2f,%.2f,%.2f,%s\n",residence[i].status, residence[i].ID, residence[i].type, residence[i].price, residence[i].owner->name, residence[i].owner->o_info, residence[i].owner->paid, residence[i].owner->bal, residence[i].owner->due, residence[i].owner->date);
-            printf("Running..., %d\n", j++);
+            sprintf(line, "%s,%s,%s,%d,%s,%s,%.2f,%.2f,%.2f,%s\n",residence[i].status, residence[i].ID, residence[i].type, residence[i].price, residence[i].owner->name, residence[i].owner->o_info, residence[i].owner->paid, residence[i].owner->bal, residence[i].owner->due, residence[i].owner->date);
+            fwrite(line, sizeof(char), strlen(line), file);
+        }
+        else if(strcmp(residence[i].status, "Available")==0){
+            sprintf(line, "%s,%s,%s,%d,%p\n",residence[i].status, residence[i].ID, residence[i].type, residence[i].price, residence[i].owner);
+            fwrite(line, sizeof(char), strlen(line), file);
         }
         else{
-            // printf("Running..., %d\n", k++);
-            fprintf(file, "%s,%s,%s,%d,%p\n",residence[i].status, residence[i].ID, residence[i].type, residence[i].price, residence[i].owner);
+            printf("\nwriting error at %d\n", i);
         }
     }
     fclose(file);
@@ -347,6 +344,7 @@ void flatinfoMenu(){
             backToMenu();
             return;
         }
+
 
     }while(1);
 }
