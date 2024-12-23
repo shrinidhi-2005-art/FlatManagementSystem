@@ -296,7 +296,7 @@ void flatinfoMenu(){
     char id[10];
     printf("\n%-10s %s\n\n", " ","-----Flat Information Menu-----");
     printf("\n%-10s %s", " ", "Please enter the flat ID: ");
-    do{
+    do{  
         scanf("%s",id);
         int x = flatinfo(id);
 
@@ -346,6 +346,10 @@ void flatinfoMenu(){
             printf("%-10s\n" , "Not Booked yet!");
             backToMenu();
             return;
+        }
+        else
+        {
+            printf("\n%-10s %s", " ", "Please enter the correct flat ID: ");
         }
 
     }while(1);
