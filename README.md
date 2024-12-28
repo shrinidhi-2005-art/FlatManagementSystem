@@ -33,7 +33,10 @@ gcc -o main dsa.c functions.c -lm
   ```cmd
   main
   ```
-
+- **Mac**:
+  ```bash
+  ./main
+  ```
 ---
 
 ## 🛠 Features

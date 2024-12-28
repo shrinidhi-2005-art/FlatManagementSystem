@@ -14,14 +14,17 @@ void display_booked(void);
 void display_available(void);
 int flatinfo(char*);
 void pay(char*);
-void flatinfoMenu();
-void bookMenu();
-void availableMenu();
-void bookedMenu();
-void paymentMenu();
-void save();
+void flatinfoMenu(void);
+void bookMenu(void);
+void availableMenu(void);
+void bookedMenu(void);
+void paymentMenu(void);
+void save(void);
 void errors(int);
-void backToMenu();
-void menufn();
+void backToMenu(void);
+void menufn(void);
+void login(void);
 
 #endif
+
+//ver 2.1.0 stable
