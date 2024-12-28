@@ -33,3 +33,4 @@ extern flat residence[size]; //saving all the flat struct inside residence array
 //endif = ending of the guard 
 #endif
 
+//ver 2.1.0 stable

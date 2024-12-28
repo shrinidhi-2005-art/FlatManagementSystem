@@ -7,9 +7,10 @@
 
 flat flats;
 
-//this will read the file and store the data inside array named residence (check flats.h)
+//Creates memory space for owner field and returns a memory location
 Owner* create_owner(){
     Owner* x = (Owner *)malloc(sizeof(Owner));
+    memset(x, 0, sizeof(char) * 100); //initializing the structure to 0 just incase, anyhow we'll be overwriting it in later codes
     if(x == NULL){
         printf("Memory allocation failed");
         exit(1);
@@ -24,25 +25,49 @@ void read_file() {
         printf("error: couldn't open the file\n");
         return;
     }
-
     char header[150];
     fgets(header, sizeof(header), file);  // Ignorin the first line in the CSV file ('Cause it has headings, which is unnecessery)
-    char line[300];
+    char line[500];
+    char status[15];
+
     while (fgets(line, sizeof(line), file)) { 
-        flats.owner = create_owner(); 
-        if (sscanf(line, "%9[^,],%9[^,],%d,%49[^,],%49[^,],%f,%f,%f,%49[^,],%s", flats.ID, flats.type, &flats.price, flats.owner->name, flats.owner->o_info, &flats.owner->paid, &flats.owner->bal, &flats.owner->due, flats.owner->date, flats.status) == 10) {
-            if (current >= size) {
-                printf("Error: Exceeded maximum residence capacity\n");
-                break;
-            }
+        int i=0;
+        while(line[i]!=','){
+            status[i]= line[i];
+            i++;
+        }
+        status[i] = '\0';
+
+        if(strcmp(status, "Booked")==0){
+            flats.owner = create_owner(); 
+
+            if (sscanf(line, "%9[^,],%9[^,],%9[^,],%d,%49[^,],%49[^,],%f,%f,%f,%s", flats.status, flats.ID, flats.type, &flats.price, flats.owner->name, flats.owner->o_info, &flats.owner->paid, &flats.owner->bal, &flats.owner->due, flats.owner->date) == 10) {
+                if (current >= size) {
+                    printf("Error: Exceeded maximum residence capacity\n");
+                    break;
+                    }
             residence[current++] = flats; // increasing the current value (from 0 (in dsa.c file)) till the loop ends... (It'll store the total number of Lines in the file and, residence array will move to the next structure element to save the data)
-        } else {
+            }
+        }
+        
+        else if (strcmp(status, "Available")==0){
+            if (sscanf(line, "%9[^,],%9[^,],%9[^,],%d", flats.status, flats.ID, flats.type, &flats.price) == 4) {
+                if (current >= size) {
+                    printf("Error: Exceeded maximum residence capacity\n");
+                    break;
+                    }
+            flats.owner = NULL;
+            residence[current++] = flats;
+            }
+        }
+        
+        else {
             printf("Failed to parse line: %s\n", line);
             printf("line: %s\n", line); //upon error reading the file, it'll just print this
         }
     }
     fclose(file);
-    printf("\nLoading the main menu...Please Wait\n");
+    printf("\nLoading the main menu...\n");
 }
 //This one will overwrite the whole thing (i mean the file) - ie., we're using it in the end of the program to save the data that we fetched/edited during the runtime... so, we'll be erasing the previous data in .csv file and rewrite everything that we've inside the memory (residence array)
 void write_file(){
@@ -51,10 +76,24 @@ void write_file(){
             printf("error: couldn't open the file");
             return;
         }
-    fprintf(file, "Flat ID,Type,Price,Owner Name,Contact Info,Amount Paid So Far,Remaining Balance,Next Monthly Installment,Due Date,Status\n");
-
+    fprintf(file, "Status,Flat ID,Type,Price,Owner Name,Contact Info,Amount Paid So Far,Remaining Balance,Next Monthly Installment,Due Date\n");
+    char line[500];
     for(int i=0; i<current; i++){
-        fprintf(file, "%s,%s,%d,%s,%s,%.2f,%.2f,%.2f,%s,%s\n",residence[i].ID, residence[i].type, residence[i].price, residence[i].owner->name, residence[i].owner->o_info, residence[i].owner->paid, residence[i].owner->bal, residence[i].owner->due, residence[i].owner->date, residence[i].status  );
+        if(strcmp(residence[i].status, "Booked")==0){
+            sprintf(line, "%s,%s,%s,%d,%s,%s,%.2f,%.2f,%.2f,%s\n",residence[i].status, residence[i].ID, residence[i].type, residence[i].price, residence[i].owner->name, residence[i].owner->o_info, residence[i].owner->paid, residence[i].owner->bal, residence[i].owner->due, residence[i].owner->date);
+
+
+            fwrite(line, sizeof(char), strlen(line), file);
+            free(residence[i].owner);
+        }
+        else if(strcmp(residence[i].status, "Available")==0){
+            sprintf(line, "%s,%s,%s,%d,%p\n",residence[i].status, residence[i].ID, residence[i].type, residence[i].price, residence[i].owner);
+
+            fwrite(line, sizeof(char), strlen(line), file);
+        }
+        else{
+            printf("\nwriting error at %d\n", i);
+        }
     }
     fclose(file);
 
@@ -84,13 +123,13 @@ int display_emi(int price){
     int ch;
     printf("\nPlease Choose Any of the EMI options from below\n");
         printf("\n1.Standard Plan\n");
-        printf("\n%-20s %-10.2f\n%-20s %-10.2f\n%-20s %-20s\n%-20s %-20s\n%-20s %.2f\n", "Down Payment:", down(price, 20), "Loan Amount:", principal(price, down(price, 20)), "EMI Tenure:", "5 Years", "Interest Rate:", "7%% annually", "EMI:", emi(principal(price, down(price, 20)), 7, 5) );
+        printf("\n%-20s %-10.2f\n%-20s %-10.2f\n%-20s %-20s\n%-20s %-20s\n%-20s %.2f\n", "Down Payment:", down(price, 20), "Loan Amount:", principal(price, down(price, 20)), "EMI Tenure:", "5 Years", "Interest Rate:", "7% annually", "EMI:", emi(principal(price, down(price, 20)), 7, 5) );
 
         printf("\n2.Flexible Tenure\n");
-        printf("\n%-20s %-10.2f\n%-20s %-10.2f\n%-20s %-20s\n%-20s %-20s\n%-20s %.2f\n", "Down Payment:", down(price, 25), "Loan Amount:", principal(price, down(price, 25)), "EMI Tenure:", "6 Years", "Interest Rate:", "7.5%% annually", "EMI:", emi(principal(price, down(price, 25)), 7.5, 6) );
+        printf("\n%-20s %-10.2f\n%-20s %-10.2f\n%-20s %-20s\n%-20s %-20s\n%-20s %.2f\n", "Down Payment:", down(price, 25), "Loan Amount:", principal(price, down(price, 25)), "EMI Tenure:", "6 Years", "Interest Rate:", "7.5% annually", "EMI:", emi(principal(price, down(price, 25)), 7.5, 6) );
 
         printf("\n3.Affordable EMI\n");
-        printf("\n%-20s %-10.2f\n%-20s %-10.2f\n%-20s %-20s\n%-20s %-20s\n%-20s %.2f\n", "Down Payment:", down(price, 30), "Loan Amount:", principal(price, down(price, 30)), "EMI Tenure:", "7 Years", "Interest Rate:", "8%% annually", "EMI:", emi(principal(price, down(price, 30)), 8, 7) );
+        printf("\n%-20s %-10.2f\n%-20s %-10.2f\n%-20s %-20s\n%-20s %-20s\n%-20s %.2f\n", "Down Payment:", down(price, 30), "Loan Amount:", principal(price, down(price, 30)), "EMI Tenure:", "7 Years", "Interest Rate:", "8% annually", "EMI:", emi(principal(price, down(price, 30)), 8, 7) );
 
         printf("Please choose a plan: ");
         while((scanf("%d", &ch)!=1)){ //when u just give scanf and use %d as format specifier, or %f or smtng which isnt a char... if u happend to type a char in the input feild when it is prompted,  the code will go infinite loop, or any unwanted errors.. so using a while loop with having a condition that it should run until the input returns 0 (ie., true - a integer has been typed), and returns error message when the condition is met, else it'll just save the input in variable 'ch' and exites the while loop
@@ -114,6 +153,7 @@ int book(char *id, char *name, char *contact){
     int ch;
     for(int i=0; i<current; i++){
         if(strcmp(residence[i].ID, id)==0){
+            residence[i].owner = create_owner(); //allocating memory for a new owner
             strcpy(residence[i].owner->name , name);
             strcpy(residence[i].owner->o_info , contact);
             printf("\nPayment method: 1. Full on payment    2. Pay with EMI\nEnter your choice: ");
@@ -126,6 +166,9 @@ int book(char *id, char *name, char *contact){
                     printf("\nSuccessfully created a record, in the name of %s with flat id %s\n", residence[i].owner->name, residence[i].ID);
                     strcpy(residence[i].status , "Booked");
                     residence[i].owner->paid = residence[i].price;
+                    residence[i].owner->bal = 00.00;
+                    residence[i].owner->due = 00.00;
+                    strcpy(residence[i].owner->date , "NULL");
                     return 1;
                 }
                 else if (ch == 2){
@@ -253,9 +296,9 @@ void flatinfoMenu(){
     int ch;
     char c;
     char id[10];
-    printf("\n%-10s %s\n\n", " ","-----Flat Information Menu-----");
-    printf("\n%-10s %s", " ", "Please enter the flat ID: ");
-    do{
+    printf("\n%-6s %s %-6s\n\n","-----", "Flat Information Menu", "-----");
+    printf("\n%-6s %s", " ", "Please enter the flat ID: ");
+    do{  
         scanf("%s",id);
         int x = flatinfo(id);
 
@@ -306,6 +349,11 @@ void flatinfoMenu(){
             backToMenu();
             return;
         }
+        else
+        {
+            printf("\n%-10s %s", " ", "Please enter the correct flat ID: ");
+        }
+
 
     }while(1);
 }
@@ -487,17 +535,15 @@ void backToMenu() {
 //  MAIN MENU funtion. 
 void menufn(){
     int ch;
-    char c;
-    char *id[10];
     while(1){
-        printf("\n--------Menu--------\n");
-        printf("1. View Flat info\n");
-        printf("2. Book a new flat\n");
-        printf("3. List booked flats\n");
-        printf("4. List Available flats\n");
-        printf("5. Update payment of a flat\n");
-        printf("6. Save and logout\n");
-        printf("\nPlease select an option: ");
+        printf("\n%-12s %s %12s\n","-----------", "Main Menu", "-----------");
+        printf("\n%-6s %-20s %6s", " ", "1. View Flat info", " ");
+        printf("\n%-6s %-20s %6s", " ", "2. Book a new flat", " ");
+        printf("\n%-6s %-20s %6s", " ", "3. List booked flats", " ");
+        printf("\n%-6s %-20s %6s", " ", "4. List Available flats", " ");
+        printf("\n%-6s %-20s %6s", " ", "5. Update payment of a flat", " ");
+        printf("\n%-6s %-20s %6s\n", " ", "6. Save and logout", " ");
+        printf("\n%-6s %-20s", " ", "Please select an option: ");
         while((scanf("%d", &ch)!=1)){
             while (getchar() != '\n');
             errors(1);
@@ -513,3 +559,37 @@ void menufn(){
         }
     }
 }
+
+//login page
+void login(){
+    char user[10];
+    int pass, i=2;
+
+    printf("%-5s %-20s %-5s\n\n", "-----","Welcome to Flat Management System","-----");
+    printf("%-6s %-20s\n\n"," ", "Please login to continue");
+    printf("%-6s %s", " ", "Username: "); //type wtvr u want but below 10 chars
+    scanf("%9s", user);
+    printf("%-6s %s", " ", "Password: "); //type the password : 1234 ('cause its what i checked in if condition below...)
+    while(1){
+        while((scanf("%d", &pass)!=1)){
+            while (getchar() != '\n');
+            printf("%-6s %s\n"," ","Password should be in Digits!!");
+            printf("%-6s %s"," ","Try again: ");
+        }
+        if(i==0){
+            printf("\n%-6s %s\n"," ","Sorry, Maximum Number Of Attempts Has Reached");
+            exit(0);
+        }
+        if (pass != 1234){
+            printf("\n%-6s Incorrect Password, Try again: (%d attempts left)\n"," ", i);
+            printf("\n%-6s %s", " ", "Password: ");
+        }
+        else{
+            printf("\n%-5s %-20s %-5s\n\n", "-----","Successfully Logged In","-----");
+            break;
+        }
+        i--;//decreases the amount of attempts after each tries
+    }
+}
+
+//ver 2.1.0 stable
