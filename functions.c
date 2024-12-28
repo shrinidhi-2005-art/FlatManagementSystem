@@ -26,7 +26,7 @@ void read_file() {
     }
     char header[150];
     fgets(header, sizeof(header), file);  // Ignorin the first line in the CSV file ('Cause it has headings, which is unnecessery)
-    char line[300];
+    char line[500];
     char status[15];
 
     while (fgets(line, sizeof(line), file)) { 
@@ -76,14 +76,21 @@ void write_file(){
             return;
         }
     fprintf(file, "Status,Flat ID,Type,Price,Owner Name,Contact Info,Amount Paid So Far,Remaining Balance,Next Monthly Installment,Due Date\n");
-    char line[300];
+    char line[500];
     for(int i=0; i<current; i++){
         if(strcmp(residence[i].status, "Booked")==0){
             sprintf(line, "%s,%s,%s,%d,%s,%s,%.2f,%.2f,%.2f,%s\n",residence[i].status, residence[i].ID, residence[i].type, residence[i].price, residence[i].owner->name, residence[i].owner->o_info, residence[i].owner->paid, residence[i].owner->bal, residence[i].owner->due, residence[i].owner->date);
+
+            // printf("%s,%s,%s,%d,%s,%s,%.2f,%.2f,%.2f,%s\n",residence[i].status, residence[i].ID, residence[i].type, residence[i].price, residence[i].owner->name, residence[i].owner->o_info, residence[i].owner->paid, residence[i].owner->bal, residence[i].owner->due, residence[i].owner->date);
+
             fwrite(line, sizeof(char), strlen(line), file);
+            free(flats.owner);
         }
         else if(strcmp(residence[i].status, "Available")==0){
             sprintf(line, "%s,%s,%s,%d,%p\n",residence[i].status, residence[i].ID, residence[i].type, residence[i].price, residence[i].owner);
+
+            // printf("%s,%s,%s,%d,%p\n",residence[i].status, residence[i].ID, residence[i].type, residence[i].price, residence[i].owner);
+
             fwrite(line, sizeof(char), strlen(line), file);
         }
         else{

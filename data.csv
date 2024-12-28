@@ -2,9 +2,7 @@ Status,Flat ID,Type,Price,Owner Name,Contact Info,Amount Paid So Far,Remaining B
 Available,FLT001,1BHK,1000000,(nil)
 Available,FLT002,1BHK,1000000,(nil)
 Available,FLT003,1BHK,1000000,(nil)
-Booked,FLT004,1BHK,1000000,Max!!,123424312,1000000.00,0.00,0.00,Due Date
-Available,FLT001,1BHK,1000000,(nil)
-Available,F
+Available,FLT004,1BHK,1000000,(nil)
 Available,FLT005,1BHK,1000000,(nil)
 Available,FLT006,1BHK,1000000,(nil)
 Available,FLT007,1BHK,1000000,(nil)
